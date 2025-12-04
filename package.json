@@ -1,0 +1,19 @@
+{
+  "name": "cap",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "dependencies": {
+    "@sap/cds": "^9",
+    "@sap/cds-sqlite": "^1.24.1",
+    "bcryptjs": "^3.0.3",
+    "express": "^4",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "private": true
+}
