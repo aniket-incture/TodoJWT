@@ -5,7 +5,7 @@ async function verifyJWT(req) {
   const expressReq = req._ && req._.req;
 
   const token = extractTokenFromReq(expressReq || req);
-console.log("Extracted token:", token);
+// console.log("Extracted token:", token);
   if (!token) return req.reject(401, 'Unauthorized: No access token provided');
 
   let payload;
@@ -16,7 +16,7 @@ console.log("Extracted token:", token);
   }
 // console.log("JWT payload:", payload);
   const userId = payload._id ;
-  console.log("User ID from payload:", userId);
+  // console.log("User ID from payload:", userId);
   if (!userId) return req.reject(401, 'Unauthorized: Invalid token payload');
 
   const tx = cds.tx(req);
@@ -31,12 +31,12 @@ console.log("Extracted token:", token);
     email: user.email,
     name: user.name,
   };
-console.log("Verified user:", req.user);
+// console.log("Verified user:", req.user);
   return req.user;
 }
 
 function extractTokenFromReq(req) {
-    console.log("Cookies from req",req)
+    // console.log("Cookies from req",req)
   if (!req) return null;
 
   if (req.cookies && req.cookies.access_token) {
