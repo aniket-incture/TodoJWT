@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-export function generateRefreshToken(userId) {
+ function generateRefreshToken(userId) {
   return jwt.sign(
     { _id: userId },
     process.env.REFRESH_TOKEN_SECRET,
@@ -9,18 +9,25 @@ export function generateRefreshToken(userId) {
   );
 }
 
-export async function hashRefreshToken(raw) {
+ async function hashRefreshToken(raw) {
   return await bcrypt.hash(raw, 10);
 }
 
-export async function verifyRefreshToken(raw, hash) {
+ async function verifyRefreshToken(raw, hash) {
   return await bcrypt.compare(raw, hash);
 }
 
-export function generateAccessToken(userId) {
+ function generateAccessToken(userId) {
   return jwt.sign(
     { _id: userId },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" } 
+    { expiresIn: "1h" } 
   );
 }
+
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  hashRefreshToken,
+  verifyRefreshToken
+};

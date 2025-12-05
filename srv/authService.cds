@@ -7,10 +7,7 @@ service AuthService {
   };
 
   action login(email : String, password : String)
-    returns {
-      accessToken  : String;
-      refreshToken : String;
-    };
+     returns { ID: UUID; email: String; name: String };
 
   action refresh(refreshToken : String)
     returns {
