@@ -12,12 +12,13 @@ console.log("Extracted token:", token);
 
   let payload;
   try {
-    payload = jwt.verify(token, ACCESS_SECRET);
+    payload = jwt.verify(token, 'jsijf23#@##$@!SDFSD2344$$#@!');
   } catch {
     return req.reject(401, 'Unauthorized: Invalid or expired access token');
   }
 console.log("JWT payload:", payload);
   const userId = payload._id ;
+  console.log("User ID from payload:", userId);
   if (!userId) return req.reject(401, 'Unauthorized: Invalid token payload');
 
   const tx = cds.tx(req);
@@ -32,7 +33,7 @@ console.log("JWT payload:", payload);
     email: user.email,
     name: user.name,
   };
-
+console.log("Verified user:", req.user);
   return req.user;
 }
 
