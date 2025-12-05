@@ -13,20 +13,11 @@ module.exports = cds.service.impl(function () {
 
   });
 
-   this.before('CREATE', 'Todos', (req) => {
-   console.log("Setting owner for new Todo item",req.data);
-   
-    if (!req.data.owner) {
-      req.data.owner = { ID: req.user.ID };
-    } else {
-     
-      if (req.data.owner.ID && req.data.owner.ID !== req.user.ID) {
-        return req.reject(403, 'Cannot create Todo for another user');
-      }
-    
-      if (typeof req.data.owner === 'string' || typeof req.data.owner === 'number') {
-        req.data.owner = { ID: req.user.ID }; 
-      }
-    }
+   this.before('CREATE', 'Todos', async(req) => {
+//    console.log("Setting owner for new Todo item",req.data);
+const user = await verifyJWT(req);
+   console.log("Authenticated user in CREATE hook:", req.user);
+      req.data.owner_ID =  req.user.ID ;
+        console.log("New Todo item with owner set:", req.data);
   });
 });

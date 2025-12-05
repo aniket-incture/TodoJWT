@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const cds = require('@sap/cds');
 
-const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
-
 async function verifyJWT(req) {
   const expressReq = req._ && req._.req;
 
@@ -16,7 +14,7 @@ console.log("Extracted token:", token);
   } catch {
     return req.reject(401, 'Unauthorized: Invalid or expired access token');
   }
-console.log("JWT payload:", payload);
+// console.log("JWT payload:", payload);
   const userId = payload._id ;
   console.log("User ID from payload:", userId);
   if (!userId) return req.reject(401, 'Unauthorized: Invalid token payload');
