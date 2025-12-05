@@ -37,6 +37,7 @@ console.log("JWT payload:", payload);
 }
 
 function extractTokenFromReq(req) {
+    console.log("Cookies from req",req)
   if (!req) return null;
 
   if (req.cookies && req.cookies.access_token) {
