@@ -14,11 +14,12 @@ module.exports = cds.service.impl(function () {
   });
 
    this.before('CREATE', 'Todos', (req) => {
-  
+   console.log("Setting owner for new Todo item",req.data);
+   
     if (!req.data.owner) {
       req.data.owner = { ID: req.user.ID };
     } else {
-    
+     
       if (req.data.owner.ID && req.data.owner.ID !== req.user.ID) {
         return req.reject(403, 'Cannot create Todo for another user');
       }
