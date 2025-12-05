@@ -1,3 +1,4 @@
+@path: 'auth'
 service AuthService {
 
    action register(email: String, password: String, name:String) returns {
