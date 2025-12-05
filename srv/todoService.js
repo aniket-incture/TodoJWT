@@ -18,6 +18,7 @@ module.exports = cds.service.impl(function () {
 const user = await verifyJWT(req);
    console.log("Authenticated user in CREATE hook:", req.user);
       req.data.owner_ID =  req.user.ID ;
+      req.data.isDone = false;
         console.log("New Todo item with owner set:", req.data);
   });
 });
