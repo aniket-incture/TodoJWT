@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
  function generateRefreshToken(userId) {
   return jwt.sign(
     { _id: userId },
-    process.env.REFRESH_TOKEN_SECRET,
+    "sjdfiJ23#@##$@!SDFsD2344$$#@!",
     { expiresIn: "7d" }
   );
 }
@@ -20,7 +20,7 @@ const bcrypt = require("bcryptjs");
  function generateAccessToken(userId) {
   return jwt.sign(
     { _id: userId },
-    process.env.ACCESS_TOKEN_SECRET,
+    "jsijf23#@##$@!SDFSD2344$$#@!",
     { expiresIn: "1h" } 
   );
 }

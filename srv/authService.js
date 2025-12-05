@@ -70,21 +70,21 @@ module.exports = cds.service.impl(function () {
     console.error("Cannot access Express res object");
     return req.reject(500, "Internal server error");
   }
-
+console.log("Setting cookies for user:", user.email);
   res.cookie("access_token", accessToken, {
     httpOnly: true,
     secure: true,        
     sameSite: "Strict",
     maxAge: 15 * 60 * 1000 
   });
-
+  console.log("Access token cookie set for user:", user.email);
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: "Strict",
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
-
+console.log("Login successful for user:", user.email);
   return { ID: user.ID, email: user.email, name: user.name };
 });
 
