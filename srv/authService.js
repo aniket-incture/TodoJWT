@@ -9,7 +9,7 @@ const { verifyJWT } = require("../helper/auth");
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: true,
-  path: '/',
+  path: "/",
 };
 
 module.exports = cds.service.impl(function () {
@@ -106,10 +106,10 @@ module.exports = cds.service.impl(function () {
     } catch (err) {
       user = null;
     }
-console.log("Logging out user:", user ? user.email : "unknown");
+    console.log("Logging out user:", user ? user.email : "unknown");
 
     if (user && user.ID) {
-        console.log("Clearing refresh token for user ID:", user.ID);
+      console.log("Clearing refresh token for user ID:", user.ID);
       try {
         const tx = cds.tx(req);
         await tx.run(
@@ -127,7 +127,10 @@ console.log("Logging out user:", user ? user.email : "unknown");
 
     try {
       const res = req._ && req._.res;
-      console.log("Express res object in logout:", res ? "available" : "not available");
+      console.log(
+        "Express res object in logout:",
+        res ? "available" : "not available"
+      );
       if (res && typeof res.clearCookie === "function") {
         console.log("Clearing cookies for user logout");
         res.clearCookie("access_token", COOKIE_OPTIONS);
@@ -138,7 +141,8 @@ console.log("Logging out user:", user ? user.email : "unknown");
     } catch (e) {
       console.error("Error clearing cookies on logout", (e && e.stack) || e);
     }
-console.log("Logout successful for user:", user ? user.email : "unknown");
+    console.log("Logout successful for user:", user ? user.email : "unknown");
     return { message: "Logged out" };
   });
 });
+ 
