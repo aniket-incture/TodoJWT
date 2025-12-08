@@ -65,6 +65,9 @@ sap.ui.define(
           //   const result = await res.json();
           //   console.log("todo success body:", result);
           oModel.setData({ title: "" });
+          if (this.loadTodos) {
+  await this.loadTodos();
+}
           MessageToast.show("Added todo");
         } catch (err) {
           console.error("Unexpected login error:", err);
