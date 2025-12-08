@@ -86,10 +86,10 @@ sap.ui.define(
         oView.setBusy(true);
 
         try {
-          const res = await fetch("/odata/v4/todo/Todos", {
+          const res = await fetch("/odata/v4/todo/Todos?$orderby=createdAt", {
             method: "GET",
             credentials: "include",
-          });
+          }); 
           console.log("Fetch todos response status:", res);
           if (!res.ok) {
             MessageBox.error("Failed to load todos");
