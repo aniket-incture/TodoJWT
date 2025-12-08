@@ -21,6 +21,13 @@ sap.ui.define(["sap/ui/core/mvc/Controller"], (Controller) => {
         sap.m.MessageToast.show("Please fill all the fields");
         return;
       }
+      const oModel = this.getView().getModel("register");
+      oModel.setData({ email: "", password: "",name:"" });
+
     },
+    onGoToLogin:function(){
+        const oRouter = this.getOwnerComponent().getRouter();
+        oRouter.navTo("Login");
+    }
   });
 });

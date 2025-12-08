@@ -23,6 +23,13 @@ sap.ui.define(["sap/ui/core/mvc/Controller"], (Controller) => {
         return;
       }
       console.log("Logging in with", oData);
+      const oModel = this.getView().getModel("login");
+       oModel.setData({ email: "", password: "" });
+
     },
+    onGoToRegister:function(){
+        const oRouter = this.getOwnerComponent().getRouter();
+        oRouter.navTo("Register");
+    }
   });
 });

@@ -16,7 +16,7 @@
         <Button text="Register" press=".onRegisterPress" />
 
         <Button text="Already have an account? Login" type="Transparent" press=".onGoToLogin" />
-
+ 
       </VBox>
     </content>
   </Page>

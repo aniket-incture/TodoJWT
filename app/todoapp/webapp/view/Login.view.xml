@@ -11,7 +11,7 @@
 
         <Button text="Login" press=".onLoginPress" />
 
-        <Button text="Don't have an account? Register instead" type="Transparent" press=".onGoToLogin"/>
+        <Button text="Don't have an account? Register instead" type="Transparent" press=".onGoToRegister"/>
 
       </VBox>
         </content>
