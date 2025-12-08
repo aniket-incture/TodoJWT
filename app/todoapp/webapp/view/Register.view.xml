@@ -1,13 +1,24 @@
 <mvc:View
-    controllerName="my.todo.todoapp.controller.Register"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+  controllerName="my.todo.todoapp.controller.Register"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
 
-    <Page id="registerPage" title="Register">
-        <content>
-            <Title text="Register Page" level="H1"/>
-            <Text text="This page allows users to create an account." />
-        </content>
-    </Page>
+  <Page id="registerPage" title="Register">
+    <content>
+      <VBox class="sapUiSmallMargin">
+
+        <Title text="Create an account" level="H1" />
+
+        <Input id="name" placeholder="Full name" value="{register>/name}" />
+        <Input id="email" placeholder="Email" value="{register>/email}" type="Email" />
+        <Input id="password" placeholder="Password" value="{register>/password}" type="Password" />
+
+        <Button text="Register" press=".onRegisterPress" />
+
+        <Button text="Already have an account? Login" type="Transparent" press=".onGoToLogin" />
+
+      </VBox>
+    </content>
+  </Page>
 
 </mvc:View>
