@@ -1,0 +1,13 @@
+<mvc:View
+    controllerName="my.todo.todoapp.controller.Register"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+
+    <Page id="registerPage" title="Register">
+        <content>
+            <Title text="Register Page" level="H1"/>
+            <Text text="This page allows users to create an account." />
+        </content>
+    </Page>
+
+</mvc:View>

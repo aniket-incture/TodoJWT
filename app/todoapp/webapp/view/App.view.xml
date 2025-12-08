@@ -1,7 +1,22 @@
-<mvc:View controllerName="my.todo.todoapp.controller.App"
-    displayBlock="true"
+<mvc:View
+    controllerName="my.todo.todoapp.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
+
     <App id="app">
+        <Page title="Main App Page">
+            <content>
+                <Button
+                    text="Login "
+                    press=".onGoToLogin" />
+                <Button
+                    text=" Register "
+                    press=".onGoToRegister" />
+                <Button
+                    text="Todo"
+                    press=".onGoToTodo" />
+            </content>
+        </Page>
     </App>
+
 </mvc:View>

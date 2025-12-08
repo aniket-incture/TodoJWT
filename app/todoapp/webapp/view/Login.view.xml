@@ -1,6 +1,13 @@
-<mvc:View controllerName="my.todo.todoapp.controller.Login"
+<mvc:View
+    controllerName="my.todo.todoapp.controller.Login"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
+
+    <Page id="loginPage" title="Login">
+        <content>
+            <Title text="Login Page" level="H1"/>
+            <Text text="This page allows users to login." />
+        </content>
     </Page>
+ 
 </mvc:View>
