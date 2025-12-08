@@ -5,12 +5,23 @@
 
     <Page id="todoPage" title="Todos">
         <content>
-            <VBox class="sapUiSmallMargin">
-        <Input id="title" placeholder="Title..." value="{todo>/title}"/>
-      
-        <Button text="Add" press=".onCreateTodo" />
 
-      </VBox>
+            <VBox class="sapUiSmallMargin">
+                <Input placeholder="Title..." value="{todo>/title}" />
+                <Button text="Add" press=".onCreateTodo" />
+            </VBox>
+
+            <List
+                id="todoList"
+                items="{todos>/value}"
+                noDataText="No todos yet">
+
+                <StandardListItem
+                    title="{todos>title}"
+                    description="{= ${todos>isDone} ? 'Completed' : 'Pending' }"
+                />
+
+            </List>
 
         </content>
     </Page>
