@@ -82,28 +82,29 @@
     "routing": {
       "config": {
         "routerClass": "sap.m.routing.Router",
-        "controlAggregation": "pages",
         "controlId": "app",
+        "controlAggregation": "pages",
         "transition": "slide",
-        "type": "View",
         "viewType": "XML",
-        "path": "my.todo.todoapp.view",
-        "async": true,
-        "viewPath": "my.todo.todoapp.view"
+        "async": true
       },
       "routes": [
-        {
-          "name": "RouteLogin",
-          "pattern": ":?query:",
-          "target": [
-            "TargetLogin"
-          ]
-        }
+        { "name": "Login", "pattern": "", "target": "Login" },
+        { "name": "Register", "pattern": "register", "target": "Register" },
+        { "name": "Todo", "pattern": "todo", "target": "Todo" }
       ],
       "targets": {
-        "TargetLogin": {
+        "Login": {
           "id": "Login",
           "name": "Login"
+        },
+        "Register": {
+          "id": "Register",
+          "name": "Register"
+        },
+        "Todo": {
+          "id": "Todo",
+          "name": "Todo"
         }
       }
     },
