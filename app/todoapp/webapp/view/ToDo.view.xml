@@ -5,8 +5,13 @@
 
     <Page id="todoPage" title="Todos">
         <content>
-            <Title text="Todo List" level="H1"/>
-            <Text text="This page will show the list of todos for the logged-in user." />
+            <VBox class="sapUiSmallMargin">
+        <Input id="title" placeholder="Title..." value="{todo>/title}"/>
+      
+        <Button text="Add" press=".onCreateTodo" />
+
+      </VBox>
+
         </content>
     </Page>
 

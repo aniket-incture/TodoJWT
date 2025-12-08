@@ -65,7 +65,8 @@ sap.ui.define(
           MessageToast.show("Login successful");
           oModel.setData({ email: "", password: "" });
 
-        //   this.getOwnerComponent().getRouter().navTo("Todo");
+          const oRouter = this.getOwnerComponent().getRouter();
+          oRouter.navTo("Todo");
         } catch (err) {
           console.error("Unexpected login error:", err);
           MessageBox.error("Unexpected error during login.");
@@ -73,6 +74,7 @@ sap.ui.define(
           oView.setBusy(false);
         }
       },
+      
       onGoToRegister: function () {
         const oRouter = this.getOwnerComponent().getRouter();
         oRouter.navTo("Register");

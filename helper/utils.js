@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
   return jwt.sign(
     { _id: userId },
     "sjdfiJ23#@##$@!SDFsD2344$$#@!",
-    { expiresIn: "7d" }
+    { expiresIn: "15d" }
   );
 }
 
@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
   return jwt.sign(
     { _id: userId },
     "jsijf23#@##$@!SDFSD2344$$#@!",
-    { expiresIn: "1h" } 
+    { expiresIn: "1d" } 
   );
 }
 
