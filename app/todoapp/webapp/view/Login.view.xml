@@ -5,8 +5,15 @@
 
     <Page id="loginPage" title="Login">
         <content>
-            <Title text="Login Page" level="H1"/>
-            <Text text="This page allows users to login." />
+             <VBox class="sapUiSmallMargin">
+        <Input id="email" placeholder="Email" value="{login>/email}" type="Email" />
+        <Input id="password" placeholder="Password" value="{login>/password}" type="Password" />
+
+        <Button text="Login" press=".onLoginPress" />
+
+        <Button text="Don't have an account? Register instead" type="Transparent" press=".onGoToLogin"/>
+
+      </VBox>
         </content>
     </Page>
  
