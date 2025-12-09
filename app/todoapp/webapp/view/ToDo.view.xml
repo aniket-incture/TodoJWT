@@ -18,42 +18,8 @@
                     class="sapUiSmallMarginTop" />
             </VBox>
  
-          <!-- Controls: Filter + Search + Sort -->
-<HBox id="controlsRow" class="controlsRow sapUiSmallMarginTop" justifyContent="SpaceBetween">
+          <!-- Controls Sort -->
 
-  <!-- Left: Segmented filter (fixed size) -->
-  <SegmentedButton id="segFilter" select=".onFilterChange" class="segmented-small">
-    <layoutData>
-      <FlexItemData growFactor="0" shrinkFactor="0" />
-    </layoutData>
-    <items>
-      <SegmentedButtonItem key="all" text="All" />
-      <SegmentedButtonItem key="done" text="Done" />
-      <SegmentedButtonItem key="pending" text="Pending" />
-    </items>
-  </SegmentedButton>
-
-  <!-- Middle: Search (flexible — takes leftover space) -->
-  <HBox class="searchBox" alignItems="Center">
-    <layoutData>
-      <FlexItemData growFactor="1" shrinkFactor="1" />
-    </layoutData>
-
-    <Input
-      id="inpSearch"
-      placeholder="Search todos..."
-      liveChange=".onSearchChange"
-      value="{pagination>/search}"
-      showValueStateMessage="false"
-      width="100%" />
-    <Button icon="sap-icon://decline" press=".onSearchClear" tooltip="Clear">
-      <layoutData>
-        <FlexItemData growFactor="0" shrinkFactor="0" />
-      </layoutData>
-    </Button>
-  </HBox>
-
-  <!-- Right: sort (fixed size) -->
   <HBox class="sortBox" alignItems="Center">
     <layoutData>
       <FlexItemData growFactor="0" shrinkFactor="0" />
@@ -69,8 +35,6 @@
       </items>
     </Select>
   </HBox>
-
-</HBox>
 
             <!-- Todo List -->
             <VBox class="sapUiSmallMarginTop">

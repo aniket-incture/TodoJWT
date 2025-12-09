@@ -87,32 +87,7 @@ sap.ui.define(
       },
       async _onRouteMatched() {
         await this.loadTodos();
-      },
-      _searchTimer: null,
-      onSearchChange(oEvt) {
-        const sVal = oEvt.getParameter
-          ? oEvt.getParameter("value")
-          : oEvt.target.value;
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/search", sVal);
-
-        if (this._searchTimer) clearTimeout(this._searchTimer);
-        this._searchTimer = setTimeout(() => {
-          this.loadTodos(1);
-        }, 300);
-      },
-       onSearchClear() {
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/search", "");
-        if (this._searchTimer) clearTimeout(this._searchTimer);
-        this.loadTodos(1);
-      },
-      onFilterChange(oEvt) {
-        const sKey = oEvt.getParameter("key");
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/filter", sKey);
-        this.loadTodos(1);
-      },
+      }, 
       onSortChange(oEvt) {
         const sKey =
           oEvt.getParameter("selectedItem")?.getKey?.() ||
