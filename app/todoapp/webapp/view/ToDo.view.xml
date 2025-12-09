@@ -11,17 +11,19 @@
                 <Button text="Add" press=".onCreateTodo" />
             </VBox>
 
-            <List
-                id="todoList"
-                items="{todos>/value}"
-                noDataText="No todos yet">
+           <List
+    id="todoList"
+    items="{todos>/value}"
+    noDataText="No todos yet"
+    mode="Delete"
+    delete=".onDeleteTodo">
 
-                <StandardListItem
-                    title="{todos>title}"
-                    description="{= ${todos>isDone} ? 'Completed' : 'Pending' }"
-                />
+    <StandardListItem
+        title="{todos>title}"
+        description="{= ${todos>isDone} ? 'Completed' : 'Pending' }" />
 
-            </List>
+</List>
+
 
         </content>
     </Page>

@@ -66,8 +66,8 @@ sap.ui.define(
           //   console.log("todo success body:", result);
           oModel.setData({ title: "" });
           if (this.loadTodos) {
-  await this.loadTodos();
-}
+            await this.loadTodos();
+          }
           MessageToast.show("Added todo");
         } catch (err) {
           console.error("Unexpected login error:", err);
@@ -89,7 +89,7 @@ sap.ui.define(
           const res = await fetch("/odata/v4/todo/Todos?$orderby=createdAt", {
             method: "GET",
             credentials: "include",
-          }); 
+          });
           console.log("Fetch todos response status:", res);
           if (!res.ok) {
             MessageBox.error("Failed to load todos");
@@ -107,7 +107,77 @@ sap.ui.define(
           oView.setBusy(false);
         }
       },
-       
+      async onDeleteTodo(oEvent) {
+        const oListItem =
+          oEvent.getParameter && oEvent.getParameter("listItem");
+        if (!oListItem) {
+          MessageBox.error("Unable to determine item to delete.");
+          return;
+        }
+        const oCtx =
+          oListItem.getBindingContext && oListItem.getBindingContext("todos");
+        if (!oCtx) {
+          MessageBox.error("No binding context found for item.");
+          return;
+        }
+        const oTodo = oCtx.getObject();
+        const sId = oTodo && oTodo.ID;
+        if (!sId) {
+          MessageBox.error("Missing todo ID");
+          return;
+        }
+
+        // confirmation wrapped in a promise so await works reliably/ Otherwise it was skipping the confirmation dialog and showing undefined for userChoice
+        const userChoice = await new Promise((resolve) => {
+          MessageBox.confirm("Delete this todo?", {
+            title: "Confirm delete",
+            actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+            onClose: resolve,
+          });
+        });
+
+        console.log("User selected action:", userChoice);
+        if (userChoice !== MessageBox.Action.OK) return;
+
+        const oView = this.getView();
+        oView.setBusy(true);
+        try {
+          const url = `/odata/v4/todo/Todos(${encodeURIComponent(
+            "'" + sId + "'"
+          )})`;
+          const res = await fetch(url, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          if (!res.ok) {
+            let errMsg = `Delete failed (${res.status})`;
+            try {
+              const errJson = await res.json();
+              errMsg =
+                errJson?.error?.message?.value ||
+                errJson?.error?.message ||
+                errJson?.message ||
+                errMsg;
+            } catch (_) {}
+            MessageBox.error(errMsg);
+            return;
+          }
+
+          const oTodosModel = this.getView().getModel("todos");
+          const oCurrent = oTodosModel.getData() || { value: [] };
+          oCurrent.value = (oCurrent.value || []).filter(
+            (item) => item.ID !== sId
+          );
+          oTodosModel.setData(oCurrent);
+
+          MessageToast.show("Deleted todo");
+        } catch (err) {
+          console.error("Delete error:", err);
+          MessageBox.error("Unexpected error while deleting todo");
+        } finally {
+          oView.setBusy(false);
+        }
+      },
     });
   }
 );
