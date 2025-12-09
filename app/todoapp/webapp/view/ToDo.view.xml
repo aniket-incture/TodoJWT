@@ -52,6 +52,17 @@
 </CustomListItem>
             </List>
 </VBox>
+
+<HBox justifyContent="Center" class="sapUiSmallMarginTop">
+
+    <Button text="Previous" press=".onPrevPage" />
+
+    <Text text="Page {pagination>/page}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+
+    <Button text="Next" press=".onNextPage" />
+
+</HBox>
+
         </content>
     </Page>
 

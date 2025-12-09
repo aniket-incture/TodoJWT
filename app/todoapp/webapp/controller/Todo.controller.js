@@ -88,7 +88,7 @@ sap.ui.define(
       async _onRouteMatched() {
         await this.loadTodos();
       },
-      async loadTodos(page =1) {
+      async loadTodos(page = 1) {
         const oView = this.getView();
         const oTodosModel = oView.getModel("todos");
         console.log("Loading todos...");
@@ -99,7 +99,6 @@ sap.ui.define(
         oView.setBusy(true);
 
         try {
-
           const res = await fetch(
             `/odata/v4/todo/Todos?$orderby=createdAt&$top=${pageSize}&$skip=${skip}&$count=true`,
             {
@@ -119,9 +118,7 @@ sap.ui.define(
           oTodosModel.setData(data);
           oPageModel.setProperty("/totalCount", data["@odata.count"]);
           oPageModel.setProperty("/page", page);
-
-        } 
-        catch (err) {
+        } catch (err) {
           console.error(err);
           MessageBox.error("Unexpected error while loading todos");
         } finally {
@@ -269,6 +266,26 @@ sap.ui.define(
           MessageBox.error("Unexpected error while updating.");
         } finally {
           oView.setBusy(false);
+        }
+      },
+      onPrevPage() {
+        const oPageModel = this.getView().getModel("pagination");
+        const page = oPageModel.getProperty("/page");
+
+        if (page > 1) {
+          this.loadTodos(page - 1);
+        }
+      },
+      onNextPage() {
+        const oPageModel = this.getView().getModel("pagination");
+        const page = oPageModel.getProperty("/page");
+        const pageSize = oPageModel.getProperty("/pageSize");
+        const total = oPageModel.getProperty("/totalCount");
+
+        const maxPage = Math.ceil(total / pageSize);
+
+        if (page < maxPage) {
+          this.loadTodos(page + 1);
         }
       },
     });
