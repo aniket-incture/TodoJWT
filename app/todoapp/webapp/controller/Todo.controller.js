@@ -9,7 +9,7 @@ sap.ui.define(
     "use strict";
 
     return Controller.extend("my.todo.todoapp.controller.Todo", {
-      onInit: function () {
+      onInit() {
         const oModel = new sap.ui.model.json.JSONModel({
           title: "",
         });
@@ -22,7 +22,7 @@ sap.ui.define(
           .getRoute("Todo")
           .attachPatternMatched(this._onRouteMatched, this);
       },
-      onCreateTodo: async function () {
+      async onCreateTodo() {
         const oView = this.getView();
         const oModel = oView.getModel("todo");
         const oData = { ...oModel.getData() };
@@ -76,10 +76,10 @@ sap.ui.define(
           oView.setBusy(false);
         }
       },
-      _onRouteMatched: async function () {
+      async _onRouteMatched() {
         await this.loadTodos();
       },
-      loadTodos: async function () {
+      async loadTodos() {
         const oView = this.getView();
         const oTodosModel = oView.getModel("todos");
         console.log("Loading todos...");
