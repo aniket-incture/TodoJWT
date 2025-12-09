@@ -20,7 +20,7 @@ sap.ui.define(
         this.getView().setModel(
           new JSONModel({
             page: 1,
-            pageSize: 7,
+            pageSize: 5,
             totalCount: 0,
           }),
           "pagination"
