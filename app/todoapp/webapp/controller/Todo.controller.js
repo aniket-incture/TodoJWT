@@ -89,7 +89,7 @@ sap.ui.define(
         await this.loadTodos();
       },
       _searchTimer: null,
-      onSearchChange: function (oEvt) {
+      onSearchChange(oEvt) {
         const sVal = oEvt.getParameter
           ? oEvt.getParameter("value")
           : oEvt.target.value;
@@ -101,19 +101,19 @@ sap.ui.define(
           this.loadTodos(1);
         }, 300);
       },
-      onSearchClear: function () {
+       onSearchClear() {
         const oPageModel = this.getView().getModel("pagination");
         oPageModel.setProperty("/search", "");
         if (this._searchTimer) clearTimeout(this._searchTimer);
         this.loadTodos(1);
       },
-      onFilterChange: function (oEvt) {
+      onFilterChange(oEvt) {
         const sKey = oEvt.getParameter("key");
         const oPageModel = this.getView().getModel("pagination");
         oPageModel.setProperty("/filter", sKey);
         this.loadTodos(1);
       },
-      onSortChange: function (oEvt) {
+      onSortChange(oEvt) {
         const sKey =
           oEvt.getParameter("selectedItem")?.getKey?.() ||
           oEvt.getParameter("selectedItem")?.getText?.() ||
