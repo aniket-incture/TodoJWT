@@ -3,7 +3,7 @@ sap.ui.define(
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "sap/ui/model/json/JSONModel"
+    "sap/ui/model/json/JSONModel",
   ],
   (Controller, MessageToast, MessageBox, JSONModel) => {
     "use strict";
@@ -16,6 +16,15 @@ sap.ui.define(
 
         this.getView().setModel(oModel, "todo");
         this.getView().setModel(new JSONModel({ value: [] }), "todos");
+
+        this.getView().setModel(
+          new JSONModel({
+            page: 1,
+            pageSize: 7,
+            totalCount: 0,
+          }),
+          "pagination"
+        );
 
         const oRouter = this.getOwnerComponent().getRouter();
         oRouter
@@ -79,17 +88,25 @@ sap.ui.define(
       async _onRouteMatched() {
         await this.loadTodos();
       },
-      async loadTodos() {
+      async loadTodos(page =1) {
         const oView = this.getView();
         const oTodosModel = oView.getModel("todos");
         console.log("Loading todos...");
+        const oPageModel = oView.getModel("pagination");
+        const pageSize = oPageModel.getProperty("/pageSize");
+        const skip = (page - 1) * pageSize;
+        console.log("Page size:", pageSize, "Skip:", skip);
         oView.setBusy(true);
 
         try {
-          const res = await fetch("/odata/v4/todo/Todos?$orderby=createdAt", {
-            method: "GET",
-            credentials: "include",
-          });
+
+          const res = await fetch(
+            `/odata/v4/todo/Todos?$orderby=createdAt&$top=${pageSize}&$skip=${skip}&$count=true`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
           console.log("Fetch todos response status:", res);
           if (!res.ok) {
             MessageBox.error("Failed to load todos");
@@ -100,7 +117,11 @@ sap.ui.define(
           console.log("Fetched todos:", data);
 
           oTodosModel.setData(data);
-        } catch (err) {
+          oPageModel.setProperty("/totalCount", data["@odata.count"]);
+          oPageModel.setProperty("/page", page);
+
+        } 
+        catch (err) {
           console.error(err);
           MessageBox.error("Unexpected error while loading todos");
         } finally {
@@ -178,7 +199,7 @@ sap.ui.define(
           oView.setBusy(false);
         }
       },
-      async  onEditTodo(oEvent) {
+      async onEditTodo(oEvent) {
         const oCtx = oEvent.getSource().getBindingContext("todos");
         const oData = oCtx.getObject();
 
@@ -199,10 +220,10 @@ sap.ui.define(
 
         this._editDialog.open();
       },
-       onCancelEdit() {
+      onCancelEdit() {
         this._editDialog.close();
       },
-       async onSaveEdit() {
+      async onSaveEdit() {
         const oView = this.getView();
         const oEdit = oView.getModel("edit").getData();
 
