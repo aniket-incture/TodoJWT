@@ -4,11 +4,10 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core">
 
-    <Page id="todoPage" title="Todos">
-        <content>
+    <Page id="todoPage" title="Todos" class="sapUiContentPadding ">
+        <content >
 
-          
-            <VBox class="sapUiSmallMargin">
+            <VBox class="sapUiResponsiveMargin sapUiSmallMarginTop">
                 <Input 
                     placeholder="Title..."
                     value="{todo>/title}" />
@@ -19,20 +18,21 @@
                     class="sapUiSmallMarginTop" />
             </VBox>
 
+<VBox class="sapUiResponsiveMargin sapUiSmallMarginTop"> 
+
             <List
                 id="todoList"
                 items="{todos>/value}"
                 noDataText="No todos yet"
                 mode="Delete"
                 delete=".onDeleteTodo"
-                class="sapUiSmallMarginTop">
-
+                class="sapUiSmallMarginTop sapUiSmallPaddingLeft">
                 <CustomListItem>
     <HBox 
-        class="todoRow"
+        class="todoRow sapUiSmallMarginBottom  "
         justifyContent="SpaceBetween"
         alignItems="Center"
-        width="100%">
+        width="100%" >
         
         <customData>
             <core:CustomData 
@@ -50,10 +50,8 @@
         <Button icon="sap-icon://edit" press=".onEditTodo" />
     </HBox>
 </CustomListItem>
-
-
             </List>
-
+</VBox>
         </content>
     </Page>
 
