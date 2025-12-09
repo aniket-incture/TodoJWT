@@ -4,8 +4,9 @@ sap.ui.define(
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/model/json/JSONModel",
+    "my/todo/todoapp/formatter/formatter"
   ],
-  (Controller, MessageToast, MessageBox, JSONModel) => {
+  (Controller, MessageToast, MessageBox, JSONModel,formatter) => {
     "use strict";
 
     return Controller.extend("my.todo.todoapp.controller.Todo", {
@@ -22,6 +23,7 @@ sap.ui.define(
           .getRoute("Todo")
           .attachPatternMatched(this._onRouteMatched, this);
       },
+      formatter: formatter,
       async onCreateTodo() {
         const oView = this.getView();
         const oModel = oView.getModel("todo");
@@ -174,6 +176,78 @@ sap.ui.define(
         } catch (err) {
           console.error("Delete error:", err);
           MessageBox.error("Unexpected error while deleting todo");
+        } finally {
+          oView.setBusy(false);
+        }
+      },
+      onEditTodo: async function (oEvent) {
+        const oCtx = oEvent.getSource().getBindingContext("todos");
+        const oData = oCtx.getObject();
+
+        if (!this._editDialog) {
+          this._editDialog = await this.loadFragment({
+            name: "my.todo.todoapp.view.EditTodoDialog",
+          });
+          this.getView().addDependent(this._editDialog);
+        }
+
+        const oEditModel = new sap.ui.model.json.JSONModel({
+          ID: oData.ID,
+          title: oData.title,
+          isDone: oData.isDone,
+        });
+
+        this.getView().setModel(oEditModel, "edit");
+
+        this._editDialog.open();
+      },
+      onCancelEdit: function () {
+        this._editDialog.close();
+      },
+      onSaveEdit: async function () {
+        const oView = this.getView();
+        const oEdit = oView.getModel("edit").getData();
+
+        const payload = {
+          title: oEdit.title,
+          isDone: oEdit.isDone,
+        };
+
+        oView.setBusy(true);
+
+        try {
+          const url = `/odata/v4/todo/Todos('${oEdit.ID}')`;
+          const res = await fetch(url, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            let msg = `Update failed (${res.status})`;
+            try {
+              const err = await res.json();
+              msg = err?.error?.message?.value || msg;
+            } catch (_) {}
+            MessageBox.error(msg);
+            return;
+          }
+
+          const oTodosModel = this.getView().getModel("todos");
+          const items = oTodosModel.getData().value;
+
+          const idx = items.findIndex((i) => i.ID === oEdit.ID);
+          if (idx >= 0) {
+            items[idx] = { ...items[idx], ...payload };
+            oTodosModel.refresh();
+          }
+
+          MessageToast.show("Todo updated");
+          this._editDialog.close();
+        } catch (err) {
+          console.error(err);
+          MessageBox.error("Unexpected error while updating.");
         } finally {
           oView.setBusy(false);
         }

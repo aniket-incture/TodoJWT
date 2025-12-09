@@ -1,1 +1,16 @@
-/* Enter your custom styles here */
+
+
+.bb{
+    border: 2px solid blue;
+}
+ .br{
+    border: 2px solid red;
+ }
+
+.todoRow[data-done] {
+  background-color: #d9fcd9
+}
+
+.todoRow:not([data-done]) {
+  background-color: #ffecec
+}

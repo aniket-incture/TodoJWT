@@ -1,29 +1,58 @@
 <mvc:View
     controllerName="my.todo.todoapp.controller.Todo"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
 
     <Page id="todoPage" title="Todos">
         <content>
 
+          
             <VBox class="sapUiSmallMargin">
-                <Input placeholder="Title..." value="{todo>/title}" />
-                <Button text="Add" press=".onCreateTodo" />
+                <Input 
+                    placeholder="Title..."
+                    value="{todo>/title}" />
+
+                <Button 
+                    text="Add"
+                    press=".onCreateTodo"
+                    class="sapUiSmallMarginTop" />
             </VBox>
 
-           <List
-    id="todoList"
-    items="{todos>/value}"
-    noDataText="No todos yet"
-    mode="Delete"
-    delete=".onDeleteTodo">
+            <List
+                id="todoList"
+                items="{todos>/value}"
+                noDataText="No todos yet"
+                mode="Delete"
+                delete=".onDeleteTodo"
+                class="sapUiSmallMarginTop">
 
-    <StandardListItem
-        title="{todos>title}"
-        description="{= ${todos>isDone} ? 'Completed' : 'Pending' }" />
+                <CustomListItem>
+    <HBox 
+        class="todoRow"
+        justifyContent="SpaceBetween"
+        alignItems="Center"
+        width="100%">
+        
+        <customData>
+            <core:CustomData 
+                key="done"
+                writeToDom="{= ${todos>isDone} }"
+                value=""
+            />
+        </customData>
 
-</List>
+        <VBox>
+            <Text text="{todos>title}" />
+            <Text text="{= ${todos>isDone} ? 'Completed' : 'Pending' }" />
+        </VBox>
 
+        <Button icon="sap-icon://edit" press=".onEditTodo" />
+    </HBox>
+</CustomListItem>
+
+
+            </List>
 
         </content>
     </Page>
