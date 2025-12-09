@@ -3,10 +3,9 @@ sap.ui.define(
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "sap/ui/model/json/JSONModel",
-    "my/todo/todoapp/formatter/formatter"
+    "sap/ui/model/json/JSONModel"
   ],
-  (Controller, MessageToast, MessageBox, JSONModel,formatter) => {
+  (Controller, MessageToast, MessageBox, JSONModel) => {
     "use strict";
 
     return Controller.extend("my.todo.todoapp.controller.Todo", {
@@ -23,7 +22,6 @@ sap.ui.define(
           .getRoute("Todo")
           .attachPatternMatched(this._onRouteMatched, this);
       },
-      formatter: formatter,
       async onCreateTodo() {
         const oView = this.getView();
         const oModel = oView.getModel("todo");
@@ -180,7 +178,7 @@ sap.ui.define(
           oView.setBusy(false);
         }
       },
-      onEditTodo: async function (oEvent) {
+      async  onEditTodo(oEvent) {
         const oCtx = oEvent.getSource().getBindingContext("todos");
         const oData = oCtx.getObject();
 
@@ -201,10 +199,10 @@ sap.ui.define(
 
         this._editDialog.open();
       },
-      onCancelEdit: function () {
+       onCancelEdit() {
         this._editDialog.close();
       },
-      onSaveEdit: async function () {
+       async onSaveEdit() {
         const oView = this.getView();
         const oEdit = oView.getModel("edit").getData();
 
