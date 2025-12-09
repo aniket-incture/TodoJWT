@@ -88,35 +88,101 @@ sap.ui.define(
       async _onRouteMatched() {
         await this.loadTodos();
       },
+      _searchTimer: null,
+      onSearchChange: function (oEvt) {
+        const sVal = oEvt.getParameter
+          ? oEvt.getParameter("value")
+          : oEvt.target.value;
+        const oPageModel = this.getView().getModel("pagination");
+        oPageModel.setProperty("/search", sVal);
+
+        if (this._searchTimer) clearTimeout(this._searchTimer);
+        this._searchTimer = setTimeout(() => {
+          this.loadTodos(1);
+        }, 300);
+      },
+      onSearchClear: function () {
+        const oPageModel = this.getView().getModel("pagination");
+        oPageModel.setProperty("/search", "");
+        if (this._searchTimer) clearTimeout(this._searchTimer);
+        this.loadTodos(1);
+      },
+      onFilterChange: function (oEvt) {
+        const sKey = oEvt.getParameter("key");
+        const oPageModel = this.getView().getModel("pagination");
+        oPageModel.setProperty("/filter", sKey);
+        this.loadTodos(1);
+      },
+      onSortChange: function (oEvt) {
+        const sKey =
+          oEvt.getParameter("selectedItem")?.getKey?.() ||
+          oEvt.getParameter("selectedItem")?.getText?.() ||
+          oEvt.getSource().getSelectedKey();
+        const oPageModel = this.getView().getModel("pagination");
+        oPageModel.setProperty("/sort", sKey);
+        this.loadTodos(1);
+      },
       async loadTodos(page = 1) {
         const oView = this.getView();
         const oTodosModel = oView.getModel("todos");
-        console.log("Loading todos...");
         const oPageModel = oView.getModel("pagination");
         const pageSize = oPageModel.getProperty("/pageSize");
         const skip = (page - 1) * pageSize;
-        console.log("Page size:", pageSize, "Skip:", skip);
+
+        // read UI state
+        const sSearch = (oPageModel.getProperty("/search") || "").trim();
+        const sFilter = oPageModel.getProperty("/filter") || "all"; // "all" | "done" | "pending"
+        // sort key should match your select values like "createdAt desc" or "title asc"
+        const sSort = oPageModel.getProperty("/sort") || "createdAt desc";
+
+        // Build OData $filter pieces (client-side); server will AND this with owner_ID in your before hook
+        const aFilters = [];
+
+        if (sSearch) {
+          // use contains + tolower for case-insensitive search on title
+          // Note: don't double-encode here; we'll encode the entire filter string later
+          // escape single quotes in search
+          const safe = sSearch.replace(/'/g, "''").toLowerCase();
+          aFilters.push(`contains(tolower(title),'${safe}')`);
+        }
+
+        if (sFilter === "done") {
+          aFilters.push(`isDone eq true`);
+        } else if (sFilter === "pending") {
+          aFilters.push(`isDone eq false`);
+        }
+
+        const sFilterQuery = aFilters.length ? aFilters.join(" and ") : "";
+
+        // Build $orderby
+        // if sSort can be "createdAt desc" or "title asc" already, use as-is
+        const sOrderBy = sSort ? sSort : "createdAt desc";
+
+        // Compose URL with proper encoding
+        let sUrl = `/odata/v4/todo/Todos?$count=true&$top=${pageSize}&$skip=${skip}&$orderby=${encodeURIComponent(
+          sOrderBy
+        )}`;
+        if (sFilterQuery) {
+          sUrl += `&$filter=${encodeURIComponent(sFilterQuery)}`;
+        }
+
         oView.setBusy(true);
 
         try {
-          const res = await fetch(
-            `/odata/v4/todo/Todos?$orderby=createdAt&$top=${pageSize}&$skip=${skip}&$count=true`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
-          console.log("Fetch todos response status:", res);
+          const res = await fetch(sUrl, {
+            method: "GET",
+            credentials: "include",
+          });
+
           if (!res.ok) {
             MessageBox.error("Failed to load todos");
             return;
           }
-          console.log("Fetch todos response ok");
-          const data = await res.json();
-          console.log("Fetched todos:", data);
 
+          const data = await res.json();
+          // set the model (odata returns value array and @odata.count)
           oTodosModel.setData(data);
-          oPageModel.setProperty("/totalCount", data["@odata.count"]);
+          oPageModel.setProperty("/totalCount", data["@odata.count"] || 0);
           oPageModel.setProperty("/page", page);
         } catch (err) {
           console.error(err);
