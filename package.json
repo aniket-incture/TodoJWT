@@ -4,7 +4,6 @@
   "description": "A simple CAP project.",
   "dependencies": {
     "@sap/cds": "^9",
-    "@sap/cds-sqlite": "^1.24.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "express": "^4",
@@ -19,6 +18,16 @@
     "watch-todoapp": "cds watch --open my.todo.todoapp/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": "db/todo.db"
+        }
+      }
+    }
+  },
   "workspaces": [
     "app/*"
   ]

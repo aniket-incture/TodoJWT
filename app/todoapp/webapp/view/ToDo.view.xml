@@ -71,7 +71,6 @@
   </HBox>
 
 </HBox>
-
             <!-- Todo List -->
             <VBox class="sapUiSmallMarginTop">
                 <List

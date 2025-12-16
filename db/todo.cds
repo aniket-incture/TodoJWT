@@ -4,7 +4,7 @@ using my.user as db from './user';
 namespace my.todo;
 
 entity Todo : cuid, managed {
-    title : String;
+    title : String @mandatory;
     isDone : Boolean; 
     owner : Association to db.User;
 }

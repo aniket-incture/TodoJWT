@@ -2,7 +2,6 @@ const cds = require("@sap/cds");
 const { verifyJWT } = require("../helper/auth");
 
 module.exports = cds.service.impl(function () {
-
   this.before("*", "Todos", async (req) => {
     console.log("Authenticating request for Todos operation");
     const user = await verifyJWT(req);
@@ -17,22 +16,14 @@ module.exports = cds.service.impl(function () {
     if (!user || !user.ID) return req.reject(401, "Authentication required");
 
     if (!req.params || req.params.length === 0) {
-        console.log("Filtering Todos for user:", user.ID);
-      const userId = user.ID;
-
-      const sel = req.query.SELECT;
-
-      const cond = [{ ref: ["owner_ID"] }, "=", { val: userId }];
-
-      if (!sel.where) {
-        sel.where = cond;
-      } else {
-        sel.where = ["(", sel.where, ")", "and", "(", cond, ")"];
-      }
+      req.query.where({ owner_ID: user.ID });
     }
 
     if (req.params && req.params[0]) {
-        console.log("Validating ownership for Todo ID:", req.params[0].ID || req.params[0]);
+      console.log(
+        "Validating ownership for Todo ID:",
+        req.params[0].ID || req.params[0]
+      );
       const id = req.params[0].ID || req.params[0];
 
       const tx = cds.tx(req);
@@ -45,7 +36,6 @@ module.exports = cds.service.impl(function () {
         return req.reject(403, "Forbidden — not the owner");
       }
     }
-
   });
 
   this.before("CREATE", "Todos", async (req) => {
@@ -123,5 +113,4 @@ module.exports = cds.service.impl(function () {
 
     console.log("Let's delete baby");
   });
-  
 });
