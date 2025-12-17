@@ -1,49 +1,52 @@
-const jwt = require('jsonwebtoken');
-const cds = require('@sap/cds');
+const jwt = require("jsonwebtoken");
+const cds = require("@sap/cds");
 
 async function verifyJWT(req) {
-  const expressReq = req._ && req._.req;
-
+  const expressReq = req._?.req;
   const token = extractTokenFromReq(expressReq || req);
-// console.log("Extracted token:", token);
-  if (!token) return req.reject(401, 'Unauthorized: No access token provided');
+
+  if (!token) {
+    req.reject(401, "Unauthorized: No access token provided");
+  }
 
   let payload;
   try {
-    payload = jwt.verify(token, 'jsijf23#@##$@!SDFSD2344$$#@!');
+    payload = jwt.verify(
+      token,
+      "jsijf23#@##$@!SDFSD2344$$#@!"
+    );
   } catch {
-    return req.reject(401, 'Unauthorized: Invalid or expired access token');
+    req.reject(401, "Unauthorized: Invalid or expired access token");
   }
-// console.log("JWT payload:", payload);
-  const userId = payload._id ;
-  // console.log("User ID from payload:", userId);
-  if (!userId) return req.reject(401, 'Unauthorized: Invalid token payload');
 
-  const tx = cds.tx(req);
-  const user = await tx.run(
-    SELECT.one.from('my.user.User').where({ ID: userId })
-  );
+  const userId = payload?._id;
+  if (!userId) {
+    req.reject(401, "Unauthorized: Invalid token payload");
+  }
 
-  if (!user) return req.reject(401, 'Unauthorized: User not found');
+  const user = await SELECT.one
+    .from("my.user.User")
+    .where({ ID: userId });
 
-  req.user = {
+  if (!user) {
+    req.reject(401, "Unauthorized: User not found");
+  }
+
+  return {
     ID: user.ID,
     email: user.email,
     name: user.name,
   };
-// console.log("Verified user:", req.user);
-  return req.user;
 }
 
 function extractTokenFromReq(req) {
-    // console.log("Cookies from req",req)
   if (!req) return null;
 
-  if (req.cookies && req.cookies.access_token) {
+  if (req.cookies?.access_token) {
     return req.cookies.access_token;
   }
 
-  if (req._ && req._.req && req._.req.cookies && req._.req.cookies.access_token) {
+  if (req._?.req?.cookies?.access_token) {
     return req._.req.cookies.access_token;
   }
 

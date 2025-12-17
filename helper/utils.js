@@ -5,12 +5,8 @@ const bcrypt = require("bcryptjs");
   return jwt.sign(
     { _id: userId },
     "sjdfiJ23#@##$@!SDFsD2344$$#@!",
-    { expiresIn: "15d" }
+    { expiresIn: "7d" }
   );
-}
-
- async function hashRefreshToken(raw) {
-  return await bcrypt.hash(raw, 10);
 }
 
  async function verifyRefreshToken(raw, hash) {
@@ -28,6 +24,5 @@ const bcrypt = require("bcryptjs");
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
-  hashRefreshToken,
   verifyRefreshToken
 };

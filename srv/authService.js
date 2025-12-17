@@ -86,7 +86,7 @@ class AuthService extends cds.ApplicationService {
 
       res.cookie("access_token", accessToken, {
         ...COOKIE_OPTIONS,
-        maxAge: 15 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie("refresh_token", refreshToken, {
