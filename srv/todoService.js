@@ -2,88 +2,76 @@ const cds = require("@sap/cds");
 const { verifyJWT } = require("../helper/auth");
 
 module.exports = cds.service.impl(function () {
-  this.before("*", "Todos", async (req) => {
-    console.log("Authenticating request for Todos operation");
-    const user = await verifyJWT(req);
-    console.log("Authenticated user for Todos operation:", user);
-    if (!user) {
-      return req.reject(401, "Authentication required");
-    }
-  });
-
   this.before("READ", "Todos", async (req) => {
     const user = await verifyJWT(req);
-    if (!user || !user.ID) return req.reject(401, "Authentication required");
+    if (!user || !user.ID) {
+      req.reject(401, "Authentication required");
+    }
 
     if (!req.params || req.params.length === 0) {
       req.query.where({ owner_ID: user.ID });
+      return;
     }
 
-    if (req.params && req.params[0]) {
-      console.log(
-        "Validating ownership for Todo ID:",
-        req.params[0].ID || req.params[0]
-      );
-      const id = req.params[0].ID || req.params[0];
+    const id = req.params[0].ID || req.params[0];
+    if (!id) req.reject(400, "Missing entity key");
 
-      const tx = cds.tx(req);
-      const todo = await tx.run(
-        SELECT.one.from("my.todo.Todo").where({ ID: id })
-      );
-      if (!todo) return req.reject(404, "Todo not found");
+    const todo = await SELECT.one.from("my.todo.Todo").where({ ID: id });
 
-      if (todo.owner_ID !== user.ID) {
-        return req.reject(403, "Forbidden — not the owner");
-      }
+    if (!todo) req.reject(404, "Todo not found");
+    if (todo.owner_ID !== user.ID) {
+      req.reject(403, "Forbidden — not the owner");
     }
   });
 
   this.before("CREATE", "Todos", async (req) => {
     const user = await verifyJWT(req);
-    console.log("Authenticated user in CREATE hook:", req.user);
-    req.data.owner_ID = req.user.ID;
+    if (!user || !user.ID) {
+      req.reject(401, "Authentication required");
+    }
+
+    req.data.owner_ID = user.ID;
     req.data.isDone = false;
-    console.log("New Todo item with owner set:", req.data);
   });
 
   this.before("UPDATE", "Todos", async (req) => {
     const user = await verifyJWT(req);
-    if (!user || !user.ID) return req.reject(401, "Authentication required");
+    if (!user || !user.ID) {
+      req.reject(401, "Authentication required");
+    }
 
     const id =
       (req.params && req.params[0] && (req.params[0].ID || req.params[0])) ||
-      (req.data && req.data.ID);
-    if (!id) return req.reject(400, "Missing entity key");
+      req.data?.ID;
 
-    const tx = cds.tx(req);
-    const todo = await tx.run(
-      SELECT.one.from("my.todo.Todo").where({ ID: id })
-    );
-    if (!todo) return req.reject(404, "Todo not found");
+    if (!id) req.reject(400, "Missing entity key");
 
-    const ownerId = todo.owner_ID || (todo.owner && todo.owner.ID);
-    if (ownerId !== user.ID)
-      return req.reject(403, "Forbidden — not the owner");
+    const todo = await SELECT.one.from("my.todo.Todo").where({ ID: id });
+
+    if (!todo) req.reject(404, "Todo not found");
+    if (todo.owner_ID !== user.ID) {
+      req.reject(403, "Forbidden — not the owner");
+    }
 
     const allowedPayload = {};
-    if (
-      req.data &&
-      Object.prototype.hasOwnProperty.call(req.data, "owner_ID")
-    ) {
-      return req.reject(400, "Updating 'owner_ID' is not allowed.");
+
+    if ("owner_ID" in req.data) {
+      req.reject(400, "Updating 'owner_ID' is not allowed");
     }
-    if (req.data && Object.prototype.hasOwnProperty.call(req.data, "title")) {
+
+    if ("title" in req.data) {
       allowedPayload.title = req.data.title;
     }
-    if (req.data && Object.prototype.hasOwnProperty.call(req.data, "isDone")) {
+
+    if ("isDone" in req.data) {
       allowedPayload.isDone =
         req.data.isDone === true || req.data.isDone === "true";
     }
 
     if (Object.keys(allowedPayload).length === 0) {
-      return req.reject(
+      req.reject(
         400,
-        "Nothing to update — only 'title' or 'isDone' can be updated."
+        "Nothing to update — only 'title' or 'isDone' can be updated"
       );
     }
 
@@ -91,26 +79,22 @@ module.exports = cds.service.impl(function () {
   });
 
   this.before("DELETE", "Todos", async (req) => {
-    console.log("DELETE operation invoked");
     const user = await verifyJWT(req);
-    if (!user || !user.ID) return req.reject(401, "Authentication required");
+    if (!user || !user.ID) {
+      req.reject(401, "Authentication required");
+    }
+
     const id =
       (req.params && req.params[0] && (req.params[0].ID || req.params[0])) ||
-      (req.data && req.data.ID);
-    console.log("Todo ID to delete:", id);
-    if (!id) return req.reject(400, "Missing entity key");
+      req.data?.ID;
 
-    const tx = cds.tx(req);
-    const todo = await tx.run(
-      SELECT.one.from("my.todo.Todo").where({ ID: id })
-    );
-    console.log("Fetched Todo item for deletion:", todo);
-    if (!todo) return req.reject(404, "Todo not found");
+    if (!id) req.reject(400, "Missing entity key");
 
-    const ownerId = todo.owner_ID || (todo.owner && todo.owner.ID);
-    if (ownerId !== user.ID)
-      return req.reject(403, "Forbidden — not the owner");
+    const todo = await SELECT.one.from("my.todo.Todo").where({ ID: id });
 
-    console.log("Let's delete baby");
+    if (!todo) req.reject(404, "Todo not found");
+    if (todo.owner_ID !== user.ID) {
+      req.reject(403, "Forbidden — not the owner");
+    }
   });
 });
