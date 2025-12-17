@@ -19,7 +19,7 @@
             </VBox>
  
           <!-- Controls: Filter + Search + Sort -->
-<HBox id="controlsRow" class="controlsRow sapUiSmallMarginTop" justifyContent="SpaceBetween">
+<HBox id="controlsRow" class="controlsRow sapUiSmallMarginTop " justifyContent="SpaceBetween">
 
   <!-- Left: Segmented filter (fixed size) -->
   <SegmentedButton id="segFilter" select=".onFilterChange" class="segmented-small">
@@ -27,9 +27,9 @@
       <FlexItemData growFactor="0" shrinkFactor="0" />
     </layoutData>
     <items>
-      <SegmentedButtonItem key="all" text="All" />
+      <SegmentedButtonItem key="all" text="All"/>
       <SegmentedButtonItem key="done" text="Done" />
-      <SegmentedButtonItem key="pending" text="Pending" />
+      <SegmentedButtonItem key="pending" text="Pending"  class="minW"/>
     </items>
   </SegmentedButton>
 
