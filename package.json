@@ -27,7 +27,7 @@
         }
       },
       "auth": {
-        "kind": "mock",
+        "kind": "mocked",
         "users": {
           "alice": {
             "password": "alice",
