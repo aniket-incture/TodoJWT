@@ -25,6 +25,23 @@
         "credentials": {
           "database": "db/todo.db"
         }
+      },
+      "auth": {
+        "kind": "mock",
+        "users": {
+          "alice": {
+            "password": "alice",
+            "roles": ["authenticated-user"]
+          },
+          "bob": {
+            "password": "bob",
+            "roles": ["authenticated-user"]
+          },
+          "admin": {
+            "password": "admin",
+            "roles": ["authenticated-user", "Admin"]
+          }
+        }
       }
     }
   },

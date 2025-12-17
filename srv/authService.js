@@ -15,8 +15,6 @@ const COOKIE_OPTIONS = {
 
 class AuthService extends cds.ApplicationService {
   async init() {
-
-
     this.on("register", async (req) => {
       const { email, password, name } = req.data;
 
@@ -28,9 +26,7 @@ class AuthService extends cds.ApplicationService {
         req.reject(400, "Password should be at least 6 characters long");
       }
 
-      const existing = await SELECT.one
-        .from("my.user.User")
-        .where({ email });
+      const existing = await SELECT.one.from("my.user.User").where({ email });
 
       if (existing) {
         req.reject(409, "User already exists");
@@ -58,9 +54,7 @@ class AuthService extends cds.ApplicationService {
         req.reject(400, "Email and password are required");
       }
 
-      const user = await SELECT.one
-        .from("my.user.User")
-        .where({ email });
+      const user = await SELECT.one.from("my.user.User").where({ email });
 
       if (!user) {
         req.reject(401, "Invalid email or password");
@@ -100,7 +94,6 @@ class AuthService extends cds.ApplicationService {
         name: user.name,
       };
     });
-
 
     this.on("logout", async (req) => {
       let user = null;
