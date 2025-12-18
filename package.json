@@ -4,7 +4,6 @@
   "description": "A simple CAP project.",
   "dependencies": {
     "@sap/cds": "^9",
-    "cookie-parser": "^1.4.7",
     "express": "^4"
   },
   "devDependencies": {

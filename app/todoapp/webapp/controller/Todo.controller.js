@@ -129,19 +129,14 @@ sap.ui.define(
         const pageSize = oPageModel.getProperty("/pageSize");
         const skip = (page - 1) * pageSize;
 
-        // read UI state
         const sSearch = (oPageModel.getProperty("/search") || "").trim();
-        const sFilter = oPageModel.getProperty("/filter") || "all"; // "all" | "done" | "pending"
-        // sort key should match your select values like "createdAt desc" or "title asc"
+        const sFilter = oPageModel.getProperty("/filter") || "all";
+
         const sSort = oPageModel.getProperty("/sort") || "createdAt desc";
 
-        // Build OData $filter pieces (client-side); server will AND this with owner_ID in your before hook
         const aFilters = [];
 
         if (sSearch) {
-          // use contains + tolower for case-insensitive search on title
-          // Note: don't double-encode here; we'll encode the entire filter string later
-          // escape single quotes in search
           const safe = sSearch.replace(/'/g, "''").toLowerCase();
           aFilters.push(`contains(tolower(title),'${safe}')`);
         }
@@ -154,11 +149,8 @@ sap.ui.define(
 
         const sFilterQuery = aFilters.length ? aFilters.join(" and ") : "";
 
-        // Build $orderby
-        // if sSort can be "createdAt desc" or "title asc" already, use as-is
         const sOrderBy = sSort ? sSort : "createdAt desc";
 
-        // Compose URL with proper encoding
         let sUrl = `/odata/v4/todo/Todos?$count=true&$top=${pageSize}&$skip=${skip}&$orderby=${encodeURIComponent(
           sOrderBy
         )}`;
@@ -180,7 +172,7 @@ sap.ui.define(
           }
 
           const data = await res.json();
-          // set the model (odata returns value array and @odata.count)
+
           oTodosModel.setData(data);
           oPageModel.setProperty("/totalCount", data["@odata.count"] || 0);
           oPageModel.setProperty("/page", page);
@@ -211,7 +203,6 @@ sap.ui.define(
           return;
         }
 
-        // confirmation wrapped in a promise so await works reliably/ Otherwise it was skipping the confirmation dialog and showing undefined for userChoice
         const userChoice = await new Promise((resolve) => {
           MessageBox.confirm("Delete this todo?", {
             title: "Confirm delete",

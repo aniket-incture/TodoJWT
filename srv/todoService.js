@@ -9,11 +9,12 @@ module.exports = cds.service.impl(function () {
 
     const id = req.params[0].ID || req.params[0];
     if (!id) req.reject(400, "Missing entity key");
-
+    // console.log("This is user id",req.user);
     const todo = await SELECT.one.from("my.todo.Todo").where({ ID: id });
 
     if (!todo) req.reject(404, "Todo not found");
-    if (todo.owner_ID !== req.user.id) { 
+
+    if (todo.owner_ID !== req.user.id) {
       req.reject(403, "Forbidden — not the owner");
     }
   });
@@ -21,6 +22,7 @@ module.exports = cds.service.impl(function () {
   this.before("CREATE", "Todos", (req) => {
     req.data.owner_ID = req.user.id;
     req.data.isDone = false;
+    // console.log("This is user id",req.user);
   });
 
   this.before("UPDATE", "Todos", async (req) => {
@@ -47,11 +49,12 @@ module.exports = cds.service.impl(function () {
       allowedPayload.title = req.data.title;
     }
 
-    if ("isDone" in req.data) {
-      allowedPayload.isDone =
-        req.data.isDone === true || req.data.isDone === "true";
-    }
+    // if ("isDone" in req.data) {
+    //   allowedPayload.isDone =
+    //     req.data.isDone === true || req.data.isDone === "true";
+    // }
 
+    req.data.isDone = true;
     if (Object.keys(allowedPayload).length === 0) {
       req.reject(
         400,
