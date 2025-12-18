@@ -13,7 +13,7 @@ module.exports = cds.service.impl(function () {
     const todo = await SELECT.one.from("my.todo.Todo").where({ ID: id });
 
     if (!todo) req.reject(404, "Todo not found");
-    if (todo.owner_ID !== req.user.id) {
+    if (todo.owner_ID !== req.user.id) { 
       req.reject(403, "Forbidden — not the owner");
     }
   });

@@ -4,10 +4,8 @@
   "description": "A simple CAP project.",
   "dependencies": {
     "@sap/cds": "^9",
-    "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
-    "express": "^4",
-    "jsonwebtoken": "^9.0.2"
+    "express": "^4"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
@@ -31,15 +29,22 @@
         "users": {
           "alice": {
             "password": "alice",
-            "roles": ["authenticated-user"]
+            "roles": [
+              "authenticated-user"
+            ]
           },
           "bob": {
             "password": "bob",
-            "roles": ["authenticated-user"]
+            "roles": [
+              "authenticated-user"
+            ]
           },
           "admin": {
             "password": "admin",
-            "roles": ["authenticated-user", "Admin"]
+            "roles": [
+              "authenticated-user",
+              "Admin"
+            ]
           }
         }
       }

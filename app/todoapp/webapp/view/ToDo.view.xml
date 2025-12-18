@@ -80,9 +80,9 @@
                     mode="Delete"
                     delete=".onDeleteTodo"
                     class="sapUiSmallPaddingLeft ">
-                    <CustomListItem>
+                    <CustomListItem class="sapUiSmallMarginBottom sapUiSmallMarginTop" >
                         <HBox
-                            class="todoRow sapUiSmallMarginBottom"
+                            class="todoRow "
                             justifyContent="SpaceBetween"
                             alignItems="Center"
                             width="100%">
