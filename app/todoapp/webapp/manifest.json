@@ -17,10 +17,9 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/odata/v4/auth/",
+        "uri": "/odata/v4/todo/",
         "type": "OData",
         "settings": {
-          "annotations": [],
           "odataVersion": "4.0"
         }
       }
@@ -88,17 +87,10 @@
         "viewType": "XML",
         "async": true
       },
-      "routes": [
-        { "name": "Login", "pattern": "login", "target": "Login" },
-        { "name": "Register", "pattern": "register", "target": "Register" },
-        { "name": "Todo", "pattern": "todo", "target": "Todo" }
-      ],
+      "routes": [{ "name": "Todo", "pattern": "todo", "target": "Todo" }],
       "targets": {
-  "Login":    { "viewName": "my.todo.todoapp.view.Login" },
-  "Register": { "viewName": "my.todo.todoapp.view.Register" },
-  "Todo":     { "viewName": "my.todo.todoapp.view.Todo" }
-}
-
+        "Todo": { "viewName": "my.todo.todoapp.view.Todo" }
+      }
     },
     "rootView": {
       "viewName": "my.todo.todoapp.view.App",

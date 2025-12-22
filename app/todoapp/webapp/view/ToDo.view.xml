@@ -1,118 +1,117 @@
 <mvc:View
-    controllerName="my.todo.todoapp.controller.Todo"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core">
+  controllerName="my.todo.todoapp.controller.Todo"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core">
 
-    <Page id="todoPage" title="Todos" class="sapUiContentPadding">
-        <content>
-            <!-- Add todo form -->
-            <VBox class="sapUiSmallMarginTop">
-                <Input
-                    placeholder="Title..."
-                    value="{todo>/title}" />
+  <Page
+    id="todoPage"
+    title="Todos"
+    class="sapUiContentPadding">
 
-                <Button
-                    text="Add"
-                    press=".onCreateTodo"
-                    class="sapUiSmallMarginTop" />
-            </VBox>
- 
-          <!-- Controls: Filter + Search + Sort -->
-<HBox id="controlsRow" class="controlsRow sapUiSmallMarginTop " justifyContent="SpaceBetween">
+    <content>
 
-  <!-- Left: Segmented filter (fixed size) -->
-  <SegmentedButton id="segFilter" select=".onFilterChange" class="segmented-small">
-    <layoutData>
-      <FlexItemData growFactor="0" shrinkFactor="0" />
-    </layoutData>
-    <items>
-      <SegmentedButtonItem key="all" text="All"/>
-      <SegmentedButtonItem key="done" text="Done" />
-      <SegmentedButtonItem key="pending" text="Pending"  class="minW"/>
-    </items>
-  </SegmentedButton>
+      <!-- Add todo form -->
+      <VBox class="sapUiSmallMarginTop">
+        <Input
+          placeholder="Title..."
+          value="{todo>/title}" />
 
-  <!-- Middle: Search (flexible — takes leftover space) -->
-  <HBox class="searchBox" alignItems="Center">
-    <layoutData>
-      <FlexItemData growFactor="1" shrinkFactor="1" />
-    </layoutData>
+        <Button
+          text="Add"
+          press=".onCreateTodo"
+          class="sapUiSmallMarginTop" />
+      </VBox>
 
-    <Input
-      id="inpSearch"
-      placeholder="Search todos..."
-      liveChange=".onSearchChange"
-      value="{pagination>/search}"
-      showValueStateMessage="false"
-      width="100%" />
-    <Button icon="sap-icon://decline" press=".onSearchClear" tooltip="Clear">
-      <layoutData>
-        <FlexItemData growFactor="0" shrinkFactor="0" />
-      </layoutData>
-    </Button>
-  </HBox>
+      <!-- Controls: Filter + Search + Sort -->
+      <HBox
+        id="controlsRow"
+        class="controlsRow sapUiSmallMarginTop"
+        justifyContent="SpaceBetween">
 
-  <!-- Right: sort (fixed size) -->
-  <HBox class="sortBox" alignItems="Center">
-    <layoutData>
-      <FlexItemData growFactor="0" shrinkFactor="0" />
-    </layoutData>
+        <!-- Filter -->
+        <SegmentedButton
+          id="segFilter"
+          select=".onFilterChange"
+          class="segmented-small">
+          <items>
+            <SegmentedButtonItem key="all" text="All" />
+            <SegmentedButtonItem key="done" text="Done" />
+            <SegmentedButtonItem key="pending" text="Pending" />
+          </items>
+        </SegmentedButton>
 
-    <Text text="Sort:" class="sapUiSmallMarginEnd" />
-    <Select id="selSort" change=".onSortChange" selectedKey="{pagination>/sort}">
-      <items>
-        <core:Item key="createdAt desc" text="Newest first" />
-        <core:Item key="createdAt asc" text="Oldest first" />
-        <core:Item key="title asc" text="Title A-Z" />
-        <core:Item key="title desc" text="Title Z-A" />
-      </items>
-    </Select>
-  </HBox>
+        <!-- Search -->
+        <HBox alignItems="Center" width="40%">
+          <Input
+            id="inpSearch"
+            placeholder="Search todos..."
+            liveChange=".onSearchChange"
+            width="100%" />
+          <Button
+            icon="sap-icon://decline"
+            press=".onSearchClear"
+            tooltip="Clear" />
+        </HBox>
 
-</HBox>
-            <!-- Todo List -->
-            <VBox class="sapUiSmallMarginTop">
-                <List
-                    id="todoList"
-                    items="{todos>/value}"
-                    noDataText="No todos yet"
-                    mode="Delete"
-                    delete=".onDeleteTodo"
-                    class="sapUiSmallPaddingLeft ">
-                    <CustomListItem class="sapUiSmallMarginBottom sapUiSmallMarginTop" >
-                        <HBox
-                            class="todoRow "
-                            justifyContent="SpaceBetween"
-                            alignItems="Center"
-                            width="100%">
- 
-                            <customData>
-                                <core:CustomData
-                                    key="done"
-                                    writeToDom="{= ${todos>isDone} }"
-                                    value="" />
-                            </customData>
+        <!-- Sort -->
+        <HBox alignItems="Center">
+          <Text text="Sort:" class="sapUiSmallMarginEnd" />
+          <Select
+            id="selSort"
+            change=".onSortChange">
+            <items>
+              <core:Item key="createdAt desc" text="Newest first" />
+              <core:Item key="createdAt asc" text="Oldest first" />
+              <core:Item key="title asc" text="Title A–Z" />
+              <core:Item key="title desc" text="Title Z–A" />
+            </items>
+          </Select>
+        </HBox>
 
-                            <VBox>
-                                <Text text="{todos>title}" />
-                                <Text text="{= ${todos>isDone} ? 'Completed' : 'Pending' }" />
-                            </VBox>
+      </HBox>
 
-                            <Button icon="sap-icon://edit" press=".onEditTodo" />
-                        </HBox>
-                    </CustomListItem>
-                </List>
-            </VBox>
+      <!-- Todo List -->
+      <VBox class="sapUiSmallMarginTop">
 
-            <!-- Pagination button -->
-            <HBox justifyContent="Center" class="sapUiSmallMarginTop">
-                <Button text="Previous" press=".onPrevPage" />
-                <Text text="Page {pagination>/page}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-                <Button text="Next" press=".onNextPage" />
+        <List
+          id="todoList"
+          items="{ path: '/Todos', templateShareable: false }"
+          growing="true"
+          growingThreshold="5"
+          growingScrollToLoad="false"
+          growingTriggerText="Load more"
+          noDataText="No todos yet"
+          mode="Delete"
+          delete=".onDeleteTodo">
+
+          <CustomListItem class="sapUiSmallMarginBottom sapUiSmallMarginTop">
+            <HBox
+              justifyContent="SpaceBetween"
+              alignItems="Center"
+              width="100%">
+
+              <VBox>
+                <Text text="{title}" />
+
+                <!-- Status using ObjectStatus -->
+                <ObjectStatus
+                  text="{= ${isDone} ? 'Completed' : 'Pending' }"
+                  state="{= ${isDone} ? 'Success' : 'Information' }" />
+              </VBox>
+
+              <Button
+                icon="sap-icon://edit"
+                press=".onEditTodo" />
+
             </HBox>
+          </CustomListItem>
 
-        </content>
-    </Page>
+        </List>
 
+      </VBox>
+
+    </content>
+
+  </Page>
 </mvc:View>

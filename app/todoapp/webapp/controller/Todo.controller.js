@@ -4,346 +4,107 @@ sap.ui.define(
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/model/json/JSONModel",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/model/Sorter",
   ],
-  (Controller, MessageToast, MessageBox, JSONModel) => {
+  function (
+    Controller,
+    MessageToast,
+    MessageBox,
+    JSONModel,
+    Filter,
+    FilterOperator,
+    Sorter
+  ) {
     "use strict";
 
     return Controller.extend("my.todo.todoapp.controller.Todo", {
       onInit() {
-        const oModel = new sap.ui.model.json.JSONModel({
-          title: "",
-        });
-
-        this.getView().setModel(oModel, "todo");
-        this.getView().setModel(new JSONModel({ value: [] }), "todos");
-
-        this.getView().setModel(
-          new JSONModel({
-            page: 1,
-            pageSize: 5,
-            totalCount: 0,
-          }),
-          "pagination"
-        );
-
-        const oRouter = this.getOwnerComponent().getRouter();
-        oRouter
-          .getRoute("Todo")
-          .attachPatternMatched(this._onRouteMatched, this);
+        this.getView().setModel(new JSONModel({ title: "" }), "todo");
       },
-      async onCreateTodo() {
-        const oView = this.getView();
-        const oModel = oView.getModel("todo");
-        const oData = { ...oModel.getData() };
 
-        if (!oData.title) {
+      onCreateTodo() {
+        const oInput = this.getView().getModel("todo").getData();
+        if (!oInput.title) {
           MessageToast.show("Title is required");
           return;
         }
 
-        oView.setBusy(true);
+        const oList = this.byId("todoList");
+        const oBinding = oList.getBinding("items");
 
-        try {
-          const res = await fetch("/odata/v4/todo/Todos", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(oData),
+        oBinding
+          .create({
+            title: oInput.title,
+            isDone: false,
+          })
+          .created()
+          .then(() => {
+            this.getView().getModel("todo").setData({ title: "" });
+            MessageToast.show("Todo added");
+          })
+          .catch((err) => {
+            MessageBox.error(err.message || "Create failed");
           });
+      },
 
-          console.log("todo response status:", res.status);
-          console.log("Response object:", res);
-          if (!res.ok) {
-            console.log("Response not ok");
-            let errMsg = `Todo failed (${res.status})`;
-            try {
-              const errJson = await res.json();
-              errMsg =
-                errJson?.error?.message?.value ||
-                errJson?.error?.message ||
-                errJson?.message ||
-                errMsg;
-            } catch (err) {
-              console.log(err);
+      onDeleteTodo(oEvent) {
+        const oItem = oEvent.getParameter("listItem");
+        const oCtx = oItem.getBindingContext();
+
+        MessageBox.confirm("Delete this todo?", {
+          onClose: (action) => {
+            if (action === MessageBox.Action.OK) {
+              oCtx
+                .delete()
+                .then(() => {
+                  MessageToast.show("Todo deleted");
+                })
+                .catch((err) => {
+                  MessageBox.error(err.message || "Delete failed");
+                });
             }
-
-            MessageBox.error(errMsg);
-            return;
-          }
-
-          //   const result = await res.json();
-          //   console.log("todo success body:", result);
-          oModel.setData({ title: "" });
-          if (this.loadTodos) {
-            await this.loadTodos();
-          }
-          MessageToast.show("Added todo");
-        } catch (err) {
-          console.error("Unexpected login error:", err);
-          MessageBox.error("Unexpected error during creation of todo.");
-        } finally {
-          oView.setBusy(false);
-        }
-      },
-      async _onRouteMatched() {
-        await this.loadTodos();
-      },
-      _searchTimer: null,
-      onSearchChange: function (oEvt) {
-        const sVal = oEvt.getParameter
-          ? oEvt.getParameter("value")
-          : oEvt.target.value;
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/search", sVal);
-
-        if (this._searchTimer) clearTimeout(this._searchTimer);
-        this._searchTimer = setTimeout(() => {
-          this.loadTodos(1);
-        }, 300);
-      },
-      onSearchClear: function () {
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/search", "");
-        if (this._searchTimer) clearTimeout(this._searchTimer);
-        this.loadTodos(1);
-      },
-      onFilterChange: function (oEvt) {
-        const sKey = oEvt.getParameter("key");
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/filter", sKey);
-        this.loadTodos(1);
-      },
-      onSortChange: function (oEvt) {
-        const sKey =
-          oEvt.getParameter("selectedItem")?.getKey?.() ||
-          oEvt.getParameter("selectedItem")?.getText?.() ||
-          oEvt.getSource().getSelectedKey();
-        const oPageModel = this.getView().getModel("pagination");
-        oPageModel.setProperty("/sort", sKey);
-        this.loadTodos(1);
-      },
-      async loadTodos(page = 1) {
-        const oView = this.getView();
-        const oTodosModel = oView.getModel("todos");
-        const oPageModel = oView.getModel("pagination");
-        const pageSize = oPageModel.getProperty("/pageSize");
-        const skip = (page - 1) * pageSize;
-
-        const sSearch = (oPageModel.getProperty("/search") || "").trim();
-        const sFilter = oPageModel.getProperty("/filter") || "all";
-
-        const sSort = oPageModel.getProperty("/sort") || "createdAt desc";
-
-        const aFilters = [];
-
-        if (sSearch) {
-          const safe = sSearch.replace(/'/g, "''").toLowerCase();
-          aFilters.push(`contains(tolower(title),'${safe}')`);
-        }
-
-        if (sFilter === "done") {
-          aFilters.push(`isDone eq true`);
-        } else if (sFilter === "pending") {
-          aFilters.push(`isDone eq false`);
-        }
-
-        const sFilterQuery = aFilters.length ? aFilters.join(" and ") : "";
-
-        const sOrderBy = sSort ? sSort : "createdAt desc";
-
-        let sUrl = `/odata/v4/todo/Todos?$count=true&$top=${pageSize}&$skip=${skip}&$orderby=${encodeURIComponent(
-          sOrderBy
-        )}`;
-        if (sFilterQuery) {
-          sUrl += `&$filter=${encodeURIComponent(sFilterQuery)}`;
-        }
-
-        oView.setBusy(true);
-
-        try {
-          const res = await fetch(sUrl, {
-            method: "GET",
-            credentials: "include",
-          });
-
-          if (!res.ok) {
-            MessageBox.error("Failed to load todos");
-            return;
-          }
-
-          const data = await res.json();
-
-          oTodosModel.setData(data);
-          oPageModel.setProperty("/totalCount", data["@odata.count"] || 0);
-          oPageModel.setProperty("/page", page);
-        } catch (err) {
-          console.error(err);
-          MessageBox.error("Unexpected error while loading todos");
-        } finally {
-          oView.setBusy(false);
-        }
-      },
-      async onDeleteTodo(oEvent) {
-        const oListItem =
-          oEvent.getParameter && oEvent.getParameter("listItem");
-        if (!oListItem) {
-          MessageBox.error("Unable to determine item to delete.");
-          return;
-        }
-        const oCtx =
-          oListItem.getBindingContext && oListItem.getBindingContext("todos");
-        if (!oCtx) {
-          MessageBox.error("No binding context found for item.");
-          return;
-        }
-        const oTodo = oCtx.getObject();
-        const sId = oTodo && oTodo.ID;
-        if (!sId) {
-          MessageBox.error("Missing todo ID");
-          return;
-        }
-
-        const userChoice = await new Promise((resolve) => {
-          MessageBox.confirm("Delete this todo?", {
-            title: "Confirm delete",
-            actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
-            onClose: resolve,
-          });
+          },
         });
-
-        console.log("User selected action:", userChoice);
-        if (userChoice !== MessageBox.Action.OK) return;
-
-        const oView = this.getView();
-        oView.setBusy(true);
-        try {
-          const url = `/odata/v4/todo/Todos(${encodeURIComponent(
-            "'" + sId + "'"
-          )})`;
-          const res = await fetch(url, {
-            method: "DELETE",
-            credentials: "include",
-          });
-          if (!res.ok) {
-            let errMsg = `Delete failed (${res.status})`;
-            try {
-              const errJson = await res.json();
-              errMsg =
-                errJson?.error?.message?.value ||
-                errJson?.error?.message ||
-                errJson?.message ||
-                errMsg;
-            } catch (_) {}
-            MessageBox.error(errMsg);
-            return;
-          }
-
-          const oTodosModel = this.getView().getModel("todos");
-          const oCurrent = oTodosModel.getData() || { value: [] };
-          oCurrent.value = (oCurrent.value || []).filter(
-            (item) => item.ID !== sId
-          );
-          oTodosModel.setData(oCurrent);
-
-          MessageToast.show("Deleted todo");
-        } catch (err) {
-          console.error("Delete error:", err);
-          MessageBox.error("Unexpected error while deleting todo");
-        } finally {
-          oView.setBusy(false);
-        }
       },
-      async onEditTodo(oEvent) {
-        const oCtx = oEvent.getSource().getBindingContext("todos");
-        const oData = oCtx.getObject();
 
-        if (!this._editDialog) {
-          this._editDialog = await this.loadFragment({
-            name: "my.todo.todoapp.view.EditTodoDialog",
-          });
-          this.getView().addDependent(this._editDialog);
+      onFilterChange(oEvent) {
+        const key = oEvent.getParameter("key");
+        const oBinding = this.byId("todoList").getBinding("items");
+
+        let aFilters = [];
+        if (key === "done") {
+          aFilters.push(new Filter("isDone", FilterOperator.EQ, true));
+        } else if (key === "pending") {
+          aFilters.push(new Filter("isDone", FilterOperator.EQ, false));
         }
 
-        const oEditModel = new sap.ui.model.json.JSONModel({
-          ID: oData.ID,
-          title: oData.title,
-          isDone: oData.isDone,
-        });
-
-        this.getView().setModel(oEditModel, "edit");
-
-        this._editDialog.open();
+        oBinding.filter(aFilters);
       },
-      onCancelEdit() {
-        this._editDialog.close();
+
+      onSearchChange(oEvent) {
+        const value = oEvent.getParameter("value");
+        const oBinding = this.byId("todoList").getBinding("items");
+
+        const aFilters = value
+          ? [new Filter("title", FilterOperator.Contains, value)]
+          : [];
+
+        oBinding.filter(aFilters);
       },
-      async onSaveEdit() {
-        const oView = this.getView();
-        const oEdit = oView.getModel("edit").getData();
 
-        const payload = {
-          title: oEdit.title,
-          isDone: oEdit.isDone,
-        };
-
-        oView.setBusy(true);
-
-        try {
-          const url = `/odata/v4/todo/Todos('${oEdit.ID}')`;
-          const res = await fetch(url, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload),
-          });
-
-          if (!res.ok) {
-            let msg = `Update failed (${res.status})`;
-            try {
-              const err = await res.json();
-              msg = err?.error?.message?.value || msg;
-            } catch (_) {}
-            MessageBox.error(msg);
-            return;
-          }
-
-          const oTodosModel = this.getView().getModel("todos");
-          const items = oTodosModel.getData().value;
-
-          const idx = items.findIndex((i) => i.ID === oEdit.ID);
-          if (idx >= 0) {
-            items[idx] = { ...items[idx], ...payload };
-            oTodosModel.refresh();
-          }
-
-          MessageToast.show("Todo updated");
-          this._editDialog.close();
-        } catch (err) {
-          console.error(err);
-          MessageBox.error("Unexpected error while updating.");
-        } finally {
-          oView.setBusy(false);
-        }
+      onSearchClear() {
+        this.byId("todoList").getBinding("items").filter([]);
       },
-      onPrevPage() {
-        const oPageModel = this.getView().getModel("pagination");
-        const page = oPageModel.getProperty("/page");
 
-        if (page > 1) {
-          this.loadTodos(page - 1);
-        }
-      },
-      onNextPage() {
-        const oPageModel = this.getView().getModel("pagination");
-        const page = oPageModel.getProperty("/page");
-        const pageSize = oPageModel.getProperty("/pageSize");
-        const total = oPageModel.getProperty("/totalCount");
+      onSortChange(oEvent) {
+        const key = oEvent.getSource().getSelectedKey();
+        const [field, order] = key.split(" ");
 
-        const maxPage = Math.ceil(total / pageSize);
-
-        if (page < maxPage) {
-          this.loadTodos(page + 1);
-        }
+        this.byId("todoList")
+          .getBinding("items")
+          .sort(new Sorter(field, order === "desc"));
       },
     });
   }
