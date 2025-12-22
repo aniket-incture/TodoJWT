@@ -95,9 +95,12 @@
                 <Text text="{title}" />
 
                 <!-- Status using ObjectStatus -->
-                <ObjectStatus
-                  text="{= ${isDone} ? 'Completed' : 'Pending' }"
-                  state="{= ${isDone} ? 'Success' : 'Information' }" />
+            
+                 <ObjectStatus
+  text="{= ${isDone} === 'Yes' ? 'Completed' : 'Pending' }"
+  state="{= ${isDone} === 'Yes' ? 'Success' : 'Error' }" />
+
+
               </VBox>
 
               <Button
