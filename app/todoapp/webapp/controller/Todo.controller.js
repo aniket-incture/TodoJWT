@@ -106,6 +106,46 @@ sap.ui.define(
           .getBinding("items")
           .sort(new Sorter(field, order === "desc"));
       },
+  onEditTodo(oEvent) {
+  const oItem = oEvent.getSource().getParent().getParent();
+  const oCtx = oItem.getBindingContext();
+
+  this._oEditContext = oCtx;
+
+  const oEditModel = new sap.ui.model.json.JSONModel({
+    title: oCtx.getProperty("title"),
+    isDone: oCtx.getProperty("isDone")
+  });
+
+  this.getView().setModel(oEditModel, "edit");
+
+  if (!this._oEditDialog) {
+    this._oEditDialog = sap.ui.xmlfragment(
+      "my.todo.todoapp.view.EditTodoDialog", // 👈 filename here
+      this
+    );
+    this.getView().addDependent(this._oEditDialog);
+  }
+
+  this._oEditDialog.open();
+}
+
+,
+onSaveEdit() {
+  const oData = this.getView().getModel("edit").getData();
+
+  this._oEditContext.setProperty("title", oData.title);
+  this._oEditContext.setProperty("isDone", oData.isDone);
+
+  this._oEditDialog.close();
+  sap.m.MessageToast.show("Todo updated");
+}
+
+,
+onCancelEdit() {
+  this._oEditDialog.close();
+}
+
     });
   }
 );

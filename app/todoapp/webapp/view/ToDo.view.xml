@@ -100,7 +100,6 @@
   text="{= ${isDone} === 'Yes' ? 'Completed' : 'Pending' }"
   state="{= ${isDone} === 'Yes' ? 'Success' : 'Error' }" />
 
-
               </VBox>
 
               <Button
